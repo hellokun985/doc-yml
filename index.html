@@ -191,10 +191,17 @@
   const BRANCH = "main";
   const ROOT_DIR = "configs";
 
-  // header/footer links
-  document.getElementById("repoLink").href = `https://github.com/${OWNER}/${REPO}`;
-  document.getElementById("branchText").textContent = BRANCH;
-  document.getElementById("dirText").textContent = ROOT_DIR + "/";
+  // header/footer links (safe even if elements are parsed later)
+  {
+    const repoA = document.getElementById("repoLink");
+    if (repoA) repoA.href = `https://github.com/${OWNER}/${REPO}`;
+
+    const branchEl = document.getElementById("branchText");
+    if (branchEl) branchEl.textContent = BRANCH;
+
+    const dirEl = document.getElementById("dirText");
+    if (dirEl) dirEl.textContent = ROOT_DIR + "/";
+  }
 
   const statusEl = document.getElementById("status");
   const rowsEl = document.getElementById("rows");
@@ -269,6 +276,14 @@
         </td></tr>`;
     }
   })();
+
+  // Ensure footer texts are set after full parse
+  window.addEventListener("load", () => {
+    const branchEl = document.getElementById("branchText");
+    if (branchEl) branchEl.textContent = BRANCH;
+    const dirEl = document.getElementById("dirText");
+    if (dirEl) dirEl.textContent = ROOT_DIR + "/";
+  });
 </script>
   <footer>
     <span>分支：<code id="branchText"></code></span>
