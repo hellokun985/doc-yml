@@ -159,7 +159,7 @@
     </div>
     <div class="actions">
       <a class="btn" id="repoLink" href="#" target="_blank" rel="noreferrer">GitHub 仓库</a>
-      <a class="btn" href="./configs/" target="_blank" rel="noreferrer">打开 configs/ 目录</a>
+      <a class="btn" id="dirLink" href="#" target="_blank" rel="noreferrer">打开 configs/ 目录</a>
     </div>
   </header>
 
@@ -195,6 +195,9 @@
   {
     const repoA = document.getElementById("repoLink");
     if (repoA) repoA.href = `https://github.com/${OWNER}/${REPO}`;
+
+    const dirA = document.getElementById("dirLink");
+    if (dirA) dirA.href = `https://github.com/${OWNER}/${REPO}/tree/${BRANCH}/${ROOT_DIR}`;
 
     const branchEl = document.getElementById("branchText");
     if (branchEl) branchEl.textContent = BRANCH;
@@ -283,6 +286,9 @@
     if (branchEl) branchEl.textContent = BRANCH;
     const dirEl = document.getElementById("dirText");
     if (dirEl) dirEl.textContent = ROOT_DIR + "/";
+
+    const dirA = document.getElementById("dirLink");
+    if (dirA) dirA.href = `https://github.com/${OWNER}/${REPO}/tree/${BRANCH}/${ROOT_DIR}`;
   });
 </script>
   <footer>
