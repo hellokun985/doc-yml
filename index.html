@@ -5,31 +5,169 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>configs/ (YAML)</title>
   <style>
-    body { max-width: 980px; margin: 40px auto; padding: 0 16px; font: 14px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
-    header { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
-    h1 { font-size: 20px; margin: 0; }
-    .meta { color:#666; }
-    input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 10px; margin: 16px 0; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
-    th { color:#666; font-weight: 600; }
-    a { color: #0b57d0; text-decoration: none; }
+    :root {
+      --text: #111;
+      --muted: #667085;
+      --border: #e5e7eb;
+      --bg: #ffffff;
+      --bg2: #fafafa;
+      --link: #0b57d0;
+    }
+
+    body {
+      max-width: 980px;
+      margin: 40px auto;
+      padding: 0 16px 56px;
+      font: 14px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: grid;
+      gap: 6px;
+    }
+
+    .brand h1 {
+      font-size: 22px;
+      line-height: 1.25;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+
+    .brand .sub {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg2);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .btn:hover { border-color: #d1d5db; }
+
+    .meta {
+      color: var(--muted);
+    }
+
+    .statusline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 10px 0 12px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin: 14px 0 10px;
+      background: var(--bg);
+      outline: none;
+    }
+
+    input:focus { border-color: #c7d2fe; box-shadow: 0 0 0 3px rgba(99,102,241,.15); }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    thead th {
+      background: var(--bg2);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: none;
+      letter-spacing: .2px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+
+    a { color: var(--link); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; }
-    .pill { display:inline-block; padding:2px 8px; border:1px solid #ddd; border-radius:999px; color:#444; font-size:12px; margin-right:6px; }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 3px 9px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: #344054;
+      background: var(--bg2);
+      font-size: 12px;
+    }
+
+    footer {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>configs/</h1>
-    <span class="meta">自动列出 configs/ 下所有 .yml/.yaml（支持子目录）</span>
+  <header class="top">
+    <div class="brand">
+      <h1>doc-yml · configs/</h1>
+      <div class="sub">托管 YAML 配置文件（支持子目录） · 提供 Pages/Raw/Edit 快捷链接</div>
+    </div>
+    <div class="actions">
+      <a class="btn" id="repoLink" href="#" target="_blank" rel="noreferrer">GitHub 仓库</a>
+      <a class="btn" href="./configs/" target="_blank" rel="noreferrer">打开 configs/ 目录</a>
+    </div>
   </header>
 
   <input id="q" placeholder="过滤：输入关键字（比如 programA / prod / rules）" />
 
-  <div class="meta" style="margin-bottom:10px;">
+  <div class="statusline">
     <span class="pill" id="status">加载中…</span>
-    <span>“Edit” 会跳转到 GitHub 在线编辑。</span>
+    <span class="meta">提示：点击 <b>Edit</b> 跳转到 GitHub 在线编辑；程序读取建议使用 <b>Raw</b>。</span>
   </div>
 
   <table>
@@ -52,6 +190,11 @@
 
   const BRANCH = "main";
   const ROOT_DIR = "configs";
+
+  // header/footer links
+  document.getElementById("repoLink").href = `https://github.com/${OWNER}/${REPO}`;
+  document.getElementById("branchText").textContent = BRANCH;
+  document.getElementById("dirText").textContent = ROOT_DIR + "/";
 
   const statusEl = document.getElementById("status");
   const rowsEl = document.getElementById("rows");
@@ -127,5 +270,9 @@
     }
   })();
 </script>
+  <footer>
+    <span>分支：<code id="branchText"></code></span>
+    <span> · 目录：<code id="dirText"></code></span>
+  </footer>
 </body>
 </html>
