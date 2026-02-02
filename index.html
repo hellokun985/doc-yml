@@ -1,11 +1,131 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>configs/ (YAML)</title>
+  <style>
+    body { max-width: 980px; margin: 40px auto; padding: 0 16px; font: 14px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+    header { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+    h1 { font-size: 20px; margin: 0; }
+    .meta { color:#666; }
+    input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 10px; margin: 16px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
+    th { color:#666; font-weight: 600; }
+    a { color: #0b57d0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; }
+    .pill { display:inline-block; padding:2px 8px; border:1px solid #ddd; border-radius:999px; color:#444; font-size:12px; margin-right:6px; }
+  </style>
 </head>
 <body>
+  <header>
+    <h1>configs/</h1>
+    <span class="meta">自动列出 configs/ 下所有 .yml/.yaml（支持子目录）</span>
+  </header>
 
+  <input id="q" placeholder="过滤：输入关键字（比如 programA / prod / rules）" />
+
+  <div class="meta" style="margin-bottom:10px;">
+    <span class="pill" id="status">加载中…</span>
+    <span>“Edit” 会跳转到 GitHub 在线编辑。</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:45%;">路径</th>
+        <th style="width:18%;">Pages</th>
+        <th style="width:18%;">Raw</th>
+        <th style="width:19%;">Edit</th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+<script>
+  // ====== 只改这里（2 行）======
+  const OWNER = "hellokun985"; // GitHub owner/org
+  const REPO  = "doc-yml";     // repo name
+  // ============================
+
+  const BRANCH = "main";
+  const ROOT_DIR = "configs";
+
+  const statusEl = document.getElementById("status");
+  const rowsEl = document.getElementById("rows");
+  const qEl = document.getElementById("q");
+
+  const ghApi = (path) => `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}?ref=${encodeURIComponent(BRANCH)}`;
+  const pagesBase = `https://${OWNER}.github.io/${REPO}/`;
+  const rawBase = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/`;
+  const editBase = `https://github.com/${OWNER}/${REPO}/edit/${BRANCH}/`;
+
+  function isYaml(name) {
+    return name.endsWith(".yml") || name.endsWith(".yaml");
+  }
+
+  async function listDir(path) {
+    const res = await fetch(ghApi(path));
+    if (!res.ok) throw new Error(`GitHub API ${res.status}: ${await res.text()}`);
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  }
+
+  async function walk(path) {
+    const items = await listDir(path);
+    const out = [];
+    for (const it of items) {
+      if (it.type === "dir") {
+        out.push(...await walk(it.path));
+      } else if (it.type === "file" && isYaml(it.name)) {
+        out.push(it.path);
+      }
+    }
+    return out;
+  }
+
+  function render(paths) {
+    const q = (qEl.value || "").trim().toLowerCase();
+    const filtered = q ? paths.filter(p => p.toLowerCase().includes(q)) : paths;
+
+    rowsEl.innerHTML = filtered.map(p => {
+      const pagesUrl = pagesBase + p;
+      const rawUrl = rawBase + p;
+      const editUrl = editBase + p;
+      return `
+        <tr>
+          <td><code>${p}</code></td>
+          <td><a href="${pagesUrl}" target="_blank" rel="noreferrer">Open</a></td>
+          <td><a href="${rawUrl}" target="_blank" rel="noreferrer">Raw</a></td>
+          <td><a href="${editUrl}" target="_blank" rel="noreferrer">Edit</a></td>
+        </tr>
+      `;
+    }).join("");
+
+    statusEl.textContent = `共 ${paths.length} 个 YAML，显示 ${filtered.length} 个`;
+  }
+
+  (async () => {
+    try {
+      statusEl.textContent = "扫描中…";
+      const paths = await walk(ROOT_DIR);
+      paths.sort();
+      window.__paths = paths;
+      render(paths);
+      qEl.addEventListener("input", () => render(window.__paths));
+    } catch (e) {
+      statusEl.textContent = "加载失败";
+      rowsEl.innerHTML = `
+        <tr><td colspan="4">
+          <pre>${String(e)}</pre>
+          <div class="meta">
+            常见原因：仓库私有导致匿名访问失败；或 OWNER/REPO/分支名不是 main；或 configs/ 目录不存在。
+          </div>
+        </td></tr>`;
+    }
+  })();
+</script>
 </body>
 </html>
